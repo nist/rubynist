@@ -100,11 +100,11 @@ puts RubyVM::InstructionSequence.compile("1+1").disasm
                         </code>
                         Ce qui donne :
                         <code>
-== disasm: #<ISeq:<compiled>@<compiled>:1 (1,0)-(1,3)> (catch: false)
+<!-- == disasm: #<ISeq:<compiled>@<compiled>:1 (1,0)-(1,3)> (catch: false)
 0000 putobject_INT2FIX_1_                                             (   1)[Li]
 0001 putobject_INT2FIX_1_
 0002 opt_plus                               <calldata!mid:+, argc:1, ARGS_SIMPLE>[CcCr]
-0004 leave
+0004 leave -->
 
                         </code>
                         </p>
@@ -123,7 +123,7 @@ ruby --mjit --mjit-verbose=2 --mjit-save-temps --mjit-min-calls=5 -e "5.times {p
                         </code>
                         Ce qui donnera :
                         <code>
-MJIT: CC defaults to /usr/bin/gcc
+<!-- MJIT: CC defaults to /usr/bin/gcc
 MJIT: tmp_dir is /tmp
 Creating precompiled header
 Starting process: /usr/bin/gcc /usr/bin/gcc -w -Wfatal-errors -fPIC -shared -w -pipe -O3 -fno-fast-math -nodefaultlibs -nostdlib -o /tmp/_ruby_mjit_hp214420u0.h.gch /home/nic/include/ruby-3.2.0+2/x86_64-linux/rb_mjit_min_header-3.2.0.h
@@ -137,7 +137,7 @@ start compilation: block in <main>@-e:1 -> /tmp/_ruby_mjit_p214420u0.c
 Starting process: /usr/bin/gcc /usr/bin/gcc -shared -w -Wfatal-errors -fPIC -shared -w -pipe -O3 -fno-fast-math -o /tmp/_ruby_mjit_p214420u0.so /tmp/_ruby_mjit_p214420u0.c -lgcc -Wl,--compress-debug-sections=zlib -nostartfiles -nodefaultlibs -nostdlib
 JIT success (1035.7ms): block in <main>@-e:1 -> /tmp/_ruby_mjit_p214420u0.c
 Successful MJIT finish
-                        </code>
+ -->                        </code>
                         Et un fichier en langage C dans le répertoire temporaire, dans l'exemple <pre>/tmp/_ruby_mjit_p214420u0.c</pre>. Ce fichier est compilé et employé par Ruby pour accélérer l'exécution. Le gain est appréciable lors de nombreux appels à une méthode.</p>
                         <ul>
                         <li><a title="Présentation de MJIT" tabindex="0" target="_blank" rel="noopener noreferrer" href="https://www.rubyguides.com/2018/11/ruby-mjit/">What Is MJIT in Ruby 2.6 & How Does It Work?</a></li>
