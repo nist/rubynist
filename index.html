@@ -115,7 +115,7 @@ puts RubyVM::InstructionSequence.compile("1+1").disasm
                         <li><a title="YARV" tabindex="0" target="_blank" rel="noopener noreferrer" href="http://www.atdot.net/yarv/">YARV: Yet Another Ruby VM</a></li>
                         </ul>
                         <h2 id="mjit" class="section-heading">MJIT</h2>
-                        <p>La version 3 de Ruby apporte un autre changement significatif : un compilateur <em>just in time</em> nommé <abbr title="Method Based Just In Time">MJIT</abbr>. Avec le compilateur original (circa 1.9), le code ruby était transposé en appel à des fonctions C. La machine virtuelle appelait ces fonctions les unes après les autres. MJIT tâche d'avoir un gain en générant une librairie C lors de l'exécution pour les méthodes les plus souvent appelées. Cette librairie est compilée (.so) puis utilisée par la machine virtuelle. Le gain de performance se fait donc sur le volume. Le nombre minimal d'appel peut être spécifié par le paramètre <pre>--mjit-min-calls</pre>.</p>
+                        <p>La version 3 de Ruby apporte un autre changement significatif : un compilateur <em>just in time</em> nommé <abbr title="Method Based Just In Time">MJIT</abbr>. Avec le compilateur original (circa 1.9), le code ruby était transposé en appel à des fonctions C. La machine virtuelle appelait ces fonctions les unes après les autres. MJIT tâche d'avoir un gain en générant une librairie C lors de l'exécution pour les méthodes les plus souvent appelées. Cette librairie est compilée (.so) puis utilisée par la machine virtuelle. Le gain de performance se fait donc sur le volume. Le nombre minimal d'appel peut être spécifié par le paramètre <em>--mjit-min-calls<em>.</p>
                         <p>Pour inspecter le travail de ce compilateur :
                         <code>
 ruby --mjit --mjit-verbose=2 --mjit-save-temps --mjit-min-calls=5 -e "5.times {puts 1+1}"
@@ -161,7 +161,11 @@ ab -c 25 -t 10 -g ab_sans_mjit.data http://localhost:4567/
                         <li><a title="Playing with JIT" tabindex="0" target="_blank" rel="noopener noreferrer" href="https://www.johnhawthorn.com/2018/02/playing-with-ruby-jit-mjit/">Playing with ruby's new JIT: MJIT</a></li>
                         </ul>
                         <h2 id="yjit" class="section-heading">YJIT</h2>
-                        <p>La version 3.1.0 de Ruby annonce l'intégration du travail de recherche d'une étudiante de l'Université de Montréal, Maxime Chevalier-Boisvert, qui l'a implanté avec d'autres ingénieurs chez Shopify. L'équipe de développement de Ruby a décidé de l'intégrer dans la version officielle. Ce compilateur utilise une approche différente de celle de MJIT : </p>
+                        <p>La version 3.1.0 de Ruby annonce l'intégration du travail de recherche d'une étudiante de l'Université de Montréal, Maxime Chevalier-Boisvert, qui l'a implanté avec d'autres ingénieurs chez Shopify. L'équipe de développement de Ruby a décidé de l'intégrer dans la version officielle. Ce compilateur utilise une approche différente de celle de MJIT : il s'agit de développer un compilateur JIT qui pourrait remplacer YARV. Le code C derrière Ruby intègre beaucoup de validations, dû à la nature dynamique de Ruby. Par exemple, si c'est une valeur nil ou si l'objet passé en paramètre est un hash. Bien entendu, toutes ces validations demandent du temps. YJIT implémente une stratégie pour éliminer ces conditions. Le tout est en développement.</p>
+                        <p>Si nous reprenons le même benchmark, nous avons cette fois ces résultats :
+                        <img class="img-fluid" src="assets/img/ab_avec_yjit.png" alt="Avec YJIT" />
+                        <span class="caption text-muted">Résultat du benchmark avec YJIT (généré avec Gnuplot).</span>
+                        </p>
                         <ul>
                         <li><a title="Annonce de YJIT" tabindex="0" target="_blank" rel="noopener noreferrer" href="https://www.ruby-lang.org/en/news/2021/12/25/ruby-3-1-0-released/">Annonce de YJIT dans la version 3.1.0</a></li>
                         <li><a title="Building a new JIT for cruby" tabindex="0" target="_blank" rel="noopener noreferrer" href="https://shopify.engineering/yjit-just-in-time-compiler-cruby">YJIT: Building a New JIT Compiler for CRuby</a></li>
