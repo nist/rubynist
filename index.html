@@ -86,7 +86,7 @@ pp Ripper.sexp("1 + 1")
 [:program, [[:binary, [:@int, "1", [1, 0]], :+, [:@int, "1", [1, 4]]]]]
                         </code>
                         </p>
-                        <p>Une fois le parser exécuté, l'interpréteur pourait interpréter le code Ruby et exécuter chaque énoncé.</p>
+                        <p>Une fois le parser exécuté, le script décortiqué se retrouve dans des piles qui sont traitées, un peu à la manière d'un processeur traditionnel.</p>
                         <ul>
                         <li><a title="Ruby execute" tabindex="0" target="_blank" rel="noopener noreferrer" href="https://patshaughnessy.net/2012/6/29/how-ruby-executes-your-code">How Ruby Executes Your Code</a></li>
                         <li><a title="Lexing and parsing" tabindex="0" target="_blank" rel="noopener noreferrer" href="http://savage.net.au/Ron/html/graphviz2.marpa/Lexing.and.Parsing.Overview.html">An Overview of Lexing and Parsing</a></li>
@@ -115,8 +115,7 @@ puts RubyVM::InstructionSequence.compile("1+1").disasm
                         <li><a title="YARV" tabindex="0" target="_blank" rel="noopener noreferrer" href="http://www.atdot.net/yarv/">YARV: Yet Another Ruby VM</a></li>
                         </ul>
                         <h2 id="mjit" class="section-heading">MJIT</h2>
-                        <p>La version 3 de Ruby apporte un autre changement significatif : un compilateur <em>just in time</em> nommé <abbr title="Method Based Just In Time">MJIT</abbr>.
-                        Il compile les instructions souvent utilisées en binaire, ce qui offre un autre gain de performance.</p>
+                        <p>La version 3 de Ruby apporte un autre changement significatif : un compilateur <em>just in time</em> nommé <abbr title="Method Based Just In Time">MJIT</abbr>. Avec le compilateur original (circa 1.9), le code ruby était transposé en appel à des fonctions C. La machine virtuelle appelait ces fonctions les unes après les autres. MJIT tâche d'avoir un gain en générant une librairie C lors de l'exécution pour les méthodes les plus souvent appelées. Cette librairie est compilée (.so) puis utilisée par la machine virtuelle. Le gain de performance se fait donc sur le volume. Le nombre minimal d'appel peut être spécifié par le paramètre <pre>--mjit-min-calls</pre>.</p>
                         <p>Pour inspecter le travail de ce compilateur :
                         <code>
 ruby --mjit --mjit-verbose=2 --mjit-save-temps --mjit-min-calls=5 -e "5.times {puts 1+1}"
@@ -138,7 +137,23 @@ Starting process: /usr/bin/gcc /usr/bin/gcc -shared -w -Wfatal-errors -fPIC -sha
 JIT success (1035.7ms): block in main@-e:1 -> /tmp/_ruby_mjit_p214420u0.c
 Successful MJIT finish
                         </code></p>
-                        <p>Et un fichier en langage C dans le répertoire temporaire, dans l'exemple <i>/tmp/_ruby_mjit_p214420u0.c</i>. Ce fichier est compilé et employé par Ruby pour accélérer l'exécution. Le gain est appréciable lors de nombreux appels à une méthode.</p>
+                        <p>Et un fichier en langage C dans le répertoire temporaire, dans l'exemple <i>/tmp/_ruby_mjit_p214420u0.c</i>.</p>
+                        <p>Voici une comparaison de l'exécution d'une application Sinatra simple :</p> 
+                        <code>
+require 'sinatra'
+get '/' do
+  "Sinatra"
+end
+                        </code>
+                        <p>mesuré avec Apache Benchmark :</p>
+                        <code>
+ab -c 25 -t 10 -g ab_sans_mjit.data http://localhost:4567/
+                        </code>
+                        <img class="img-fluid" src="assets/img/ab_sans_mjit.png" alt="Sans MJIT" />
+                        <span class="caption text-muted">Résultat du benchmark sans MJIT (généré avec Gnuplot).</span>
+                        <img class="img-fluid" src="assets/img/ab_avec_mjit.png" alt="Avec MJIT" />
+                        <span class="caption text-muted">Résultat du benchmark avec MJIT (généré avec Gnuplot).</span>
+                        <p>L'ajout de ce compilateur a contribué à tripler la performance de la version 3 de Ruby par rapport à la version 2.</p>
                         <ul>
                         <li><a title="Présentation de MJIT" tabindex="0" target="_blank" rel="noopener noreferrer" href="https://www.rubyguides.com/2018/11/ruby-mjit/">What Is MJIT in Ruby 2.6 & How Does It Work?</a></li>
                         <li><a title="Documentation JIT" tabindex="0" target="_blank" rel="noopener noreferrer" href="https://bugs.ruby-lang.org/projects/ruby/wiki/MJIT">How to use Ruby's JIT compiler</a></li>
@@ -146,7 +161,7 @@ Successful MJIT finish
                         <li><a title="Playing with JIT" tabindex="0" target="_blank" rel="noopener noreferrer" href="https://www.johnhawthorn.com/2018/02/playing-with-ruby-jit-mjit/">Playing with ruby's new JIT: MJIT</a></li>
                         </ul>
                         <h2 id="yjit" class="section-heading">YJIT</h2>
-                        <p>La version 3.1.0 de Ruby annonce l'intégration du travail de recherche d'une étudiante de l'Université de Montréal, Maxime Chevalier-Boisvert, qui l'a implanté avec d'autres ingénieurs chez Shopify. L'équipe de développement de Ruby a décidé de l'intégrer dans la version officielle.</p>
+                        <p>La version 3.1.0 de Ruby annonce l'intégration du travail de recherche d'une étudiante de l'Université de Montréal, Maxime Chevalier-Boisvert, qui l'a implanté avec d'autres ingénieurs chez Shopify. L'équipe de développement de Ruby a décidé de l'intégrer dans la version officielle. Ce compilateur utilise une approche différente de celle de MJIT : </p>
                         <ul>
                         <li><a title="Annonce de YJIT" tabindex="0" target="_blank" rel="noopener noreferrer" href="https://www.ruby-lang.org/en/news/2021/12/25/ruby-3-1-0-released/">Annonce de YJIT dans la version 3.1.0</a></li>
                         <li><a title="Building a new JIT for cruby" tabindex="0" target="_blank" rel="noopener noreferrer" href="https://shopify.engineering/yjit-just-in-time-compiler-cruby">YJIT: Building a New JIT Compiler for CRuby</a></li>
