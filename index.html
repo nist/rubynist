@@ -172,7 +172,20 @@ ab -c 25 -t 10 -g ab_sans_mjit.data http://localhost:4567/
                         <li><a title="Article sur YJIT" tabindex="0" target="_blank" rel="noopener noreferrer" href="https://dl.acm.org/doi/10.1145/3486606.3486781">YJIT: a basic block versioning JIT compiler for CRuby</a></li>
                         </ul>
                         <h2 id="wasm" class="section-heading">WebAssembly</h2>
-                        <p>La version 3.2.0 intègre la génération de WebAssembly grâce à WASI.</p>
+                        <p>La version 3.2.0 intègre WebAssembly. Le premier objectif était de faire un interpréteur Ruby en WebAssembly. Ainsi, il serait possible de l'intégrer dans un navigateur et de faire une version plus performante de <a title="Ruby dans un navigateur" tabindex="0" target="_blank" rel="noopener noreferrer" href="https://try.ruby-lang.org/">Try Ruby</a>.</p>
+                        <p>Cette version de Ruby en WebAssembly combiné avec <a title="WASI" tabindex="0" target="_blank" rel="noopener noreferrer" href="https://wasi.dev/">WASI</a>, l'interface système d'exécution de WebAssembly hors d'un navigateur, permet d'exécuter du code ruby en WebAssembly :</p>
+                        <code>
+wasmtime ruby.wasm -- -e "puts RUBY_DESCRIPTION; 3.times { puts 'Yeah! '}"
+                        </code>
+                        <p>Ce qui donne :</p>
+                        <code>
+ruby 3.2.0dev (2022-04-09) [wasm32-wasi]
+Yeah! 
+Yeah! 
+Yeah!
+                        </code>
+                        <p>Note : Il faut installer au préalable <a title="Wasmtime" tabindex="0" target="_blank" rel="noopener noreferrer" href="https://wasmtime.dev/">Wasmtime</a> et <a title="ruby.wasm" tabindex="0" target="_blank" rel="noopener noreferrer" href="https://github.com/ruby/ruby.wasm/releases">la version WebAssembly de Ruby</a>.</p>
+                        <p>Ce qui serait plus intéressant serait de convertir une application Ruby en WebAssembly. Ainsi, elle pourrait être exécutée directement dans un navigateur ou sur un serveur, sans avoir recours à l'interpréteur Ruby. Il y a <a title="Convertir application Ruby en WebAssembly" tabindex="0" target="_blank" rel="noopener noreferrer" href="https://github.com/kateinoigakukun/wasi-vfs/wiki/Getting-Started-with-CRuby">du travail effectué en ce sens</a>, mais c'est encore préliminaire.</p>
                         <ul>
                         <li><a title="Annonce version 3.2.0 preview 1" tabindex="0" target="_blank" rel="noopener noreferrer" href="https://www.ruby-lang.org/en/news/2022/04/03/ruby-3-2-0-preview1-released/">Ruby 3.2.0 Preview 1 Released</a></li>
                         <li><a title="Annonce version 3.2.0 preview 2" tabindex="0" target="_blank" rel="noopener noreferrer" href="https://www.ruby-lang.org/en/news/2022/09/09/ruby-3-2-0-preview2-released/">Ruby 3.2.0 Preview 2 Released</a></li>
